@@ -77,5 +77,4 @@ public class ProductsController {
         return "product-page";
     }
 
-
 }
