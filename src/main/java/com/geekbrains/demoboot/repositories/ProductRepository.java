@@ -53,7 +53,9 @@ public class ProductRepository {
         products.remove(getById(id));
     }
 
-    public List<Product> findAllByTitle(String name) {
-        return products.stream().filter(product -> product.getTitle().contains(name)).collect(Collectors.toList());
+    public List<Product> findAllByTitle(String title) {
+        return products.stream()
+                .filter(product -> product.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }

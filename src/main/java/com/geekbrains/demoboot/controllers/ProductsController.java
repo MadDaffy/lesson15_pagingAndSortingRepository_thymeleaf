@@ -40,11 +40,12 @@ public class ProductsController {
         return "redirect:/products";
     }
 
-    @PostMapping("/find")
-    public String findProduct(Model model, @ModelAttribute(value = "product") Product product) {
-        Product product1 = new Product();
-        model.addAttribute("products", productsService.getAllProductsByTitle(product.getTitle()));
-        model.addAttribute("product", product1);
+    @GetMapping("/find")
+    public String findProduct(Model model, @RequestParam(value = "title") String title) {
+        Product product = new Product();
+        model.addAttribute("products", productsService.getAllProductsByTitle(title));
+        model.addAttribute("product", product);
+        model.addAttribute("title", title);
         return "/products";
     }
 
