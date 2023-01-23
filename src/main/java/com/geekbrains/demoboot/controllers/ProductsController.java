@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/products")
@@ -34,8 +33,7 @@ public class ProductsController {
 
         if (pageNumber == null) {
             pageNumber = 0;
-        }
-        else {
+        } else {
             --pageNumber;
         }
         Specification<Product> specification = Specification.where(null);
