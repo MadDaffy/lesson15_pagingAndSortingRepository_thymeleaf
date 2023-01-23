@@ -11,6 +11,8 @@
 <body>
 <div class="container">
 
+
+
     <table class="table table-hover">
         <thead>
         <tr>
@@ -30,21 +32,34 @@
             <td th:text="${product.title}"/>
             <td th:text="${product.price}"/>
             <td>
+
                 <a th:href="@{'/products/show/' + ${product.id}}" th:text="view"/>
                 <a th:href="@{'/products/remove/' + ${product.id}}" th:text="delete"/>
             </td>
-            <!--            <td>-->
-            <!--                -->
-            <!--            </td>-->
         </tr>
         </tbody>
     </table>
-    <span th:text="${'Всего товаров ' + products.size()}"/><br>
+
+    <div>
+        <span th:each="pageNumber : ${pageTotalElements}">
+            <a th:href="@{'/products/?pageNumber=' + ${pageNumber+1}}" th:text="${pageNumber+1}"/>
+        </span>
+    </div>
+    <br>
+    <div>
     <th>Найти товар по имени</th>
-    <form th:action="@{/products/find}">
+    <form>
         <div style="margin-bottom: 25px" class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
             <input th:value ="${title}" name = "title" placeholder="title (*)" class="form-control"/>
+        </div>
+        <div style="margin-bottom: 25px" class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input th:value ="${minPrice}" name = "minPrice" placeholder="min price (*)" class="form-control"/>
+        </div>
+        <div style="margin-bottom: 25px" class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input th:value ="${maxPrice}" name = "maxPrice" placeholder="max price (*)" class="form-control"/>
         </div>
 
         <div style="margin-top: 10px" class="form-group">
@@ -53,14 +68,10 @@
             </div>
         </div>
     </form>
+    </div>
     <th>Добавить товар</th>
     <form th:action="@{/products/add}"
           th:object="${product}" method="post" class="form-horizontal">
-
-        <div style="margin-bottom: 25px" class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-            <input th:field="*{id}" placeholder="id (*)" class="form-control"/>
-        </div>
 
         <div style="margin-bottom: 25px" class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>

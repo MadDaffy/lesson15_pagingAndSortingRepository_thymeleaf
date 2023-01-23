@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ProductRepository {
+public class ProductRepositoryOld {
     private List<Product> products;
 
     @PostConstruct
