@@ -39,7 +39,7 @@ spring:
     show-sql: ${SHOW_SQL:true}
 
   datasource:
-    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5433/postgres?currentSchema=boot}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=boot}
     username: ${DATASOURCE_USERNAME:postgres}
     password: ${DATASOURCE_PASSWORD:1234}
     hikari:
