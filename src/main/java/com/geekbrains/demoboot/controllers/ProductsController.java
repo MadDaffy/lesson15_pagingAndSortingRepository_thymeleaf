@@ -1,20 +1,30 @@
 package com.geekbrains.demoboot.controllers;
 
+import static org.springframework.http.ResponseEntity.ok;
+
+import com.geekbrains.demoboot.dto.ProductDto;
+import com.geekbrains.demoboot.dto.filter.ProductFilter;
 import com.geekbrains.demoboot.entities.Product;
-import com.geekbrains.demoboot.repositories.specifications.ProductSpecs;
 import com.geekbrains.demoboot.services.ProductsService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-@Controller
+@RestController
 @RequestMapping("/products")
 public class ProductsController {
     private ProductsService productsService;
@@ -24,45 +34,31 @@ public class ProductsController {
         this.productsService = productsService;
     }
 
-    @GetMapping
-    public String showProductsList(Model model,
-                                   @RequestParam(value = "title", required = false) String title,
-                                   @RequestParam(value = "minPrice", required = false) Integer minPrice,
-                                   @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
-                                   @RequestParam(value = "pageNumber", required = false) Integer pageNumber) {
+    @Operation(summary = "Получение списка продуктов с учетом фильтра")
+    @PostMapping(value = "/search")
+    public ResponseEntity<List<ProductDto>> search(@RequestBody ProductFilter filter,
+                                                   @RequestParam(value = "pageNumber") Integer pageNumber,
+                                                   @RequestParam(value = "count") Integer count) {
 
-        if (pageNumber == null) {
-            pageNumber = 0;
-        } else {
-            --pageNumber;
-        }
-        Specification<Product> specification = Specification.where(null);
-        StringBuilder filters = new StringBuilder();
-        if (title != null) {
-            specification = specification.and(ProductSpecs.titleContains(title));
-            filters.append("$title=" + title);
-        }
-        if (minPrice != null) {
-            specification = specification.and(ProductSpecs.priceGreaterThanOrEq(minPrice));
-            filters.append("$minPrice=" + minPrice);
-        }
-        if (maxPrice != null) {
-            specification = specification.and(ProductSpecs.priceLesserThanOrEq(maxPrice));
-            filters.append("$maxPrice=" + maxPrice);
-        }
-
-        Page<Product> productsPage = productsService.getProductsWithPagingAndFiltering(specification, pageNumber, 5);
-        Product product = new Product();
-        model.addAttribute("products", productsPage.getContent());
-        model.addAttribute("product", product);
-        model.addAttribute("title", title);
-        model.addAttribute("minPrice", minPrice);
-        model.addAttribute("maxPrice", maxPrice);
-        model.addAttribute("pageTotalElements", IntStream.range(0, productsPage.getTotalPages()).toArray());
-
-
-        return "/products";
+        return ok(productsService.findByFilter(filter, PageRequest.of(pageNumber, count)));
     }
+
+    //    @Operation(summary = "Получение списка продуктов с учетом фильтра thymeleaf")
+    //    @GetMapping(value = "/search/thymeleaf")
+    //    public String showProductsList(Model model,
+    //                                   @RequestBody ProductFilter filter,
+    //                                   @RequestParam(value = "pageNumber") Integer pageNumber,
+    //                                   @RequestParam(value = "count") Integer count) {
+    //
+    //        Page<ProductDto> productsPage = productsService.findByFilter(filter,  PageRequest.of(pageNumber, count));
+    //        model.addAttribute("products", productsPage.getContent());
+    //        model.addAttribute("title", filter.getTitle());
+    //        model.addAttribute("minPrice", filter.getPriceFrom());
+    //        model.addAttribute("maxPrice", filter.getPriceTo());
+    //        model.addAttribute("pageTotalElements", IntStream.range(0, productsPage.getTotalPages()).toArray());
+    //
+    //        return "/products";
+    //    }
 
     @PostMapping("/add")
     public String addProduct(@ModelAttribute(value = "product") Product product) {
@@ -76,43 +72,6 @@ public class ProductsController {
         return "redirect:/products";
     }
 
-//    @GetMapping("/find")
-//    public String findProduct(Model model,
-//                              @RequestParam(value = "title") String title,
-//                              @RequestParam(value = "minPrice") int minPrice,
-//                              @RequestParam(value = "maxPrice") int maxPrice) {
-////        Product product = new Product();
-////        model.addAttribute("products", productsService.getAllProductsByTitle(title));
-////        model.addAttribute("product", product);
-////        model.addAttribute("title", title);
-////        System.out.printf("Min %d, Max %d", minPrice, maxPrice);
-//        Specification<Product> specification = Specification.where(null);
-//        StringBuilder filters = new StringBuilder();
-//        if (title != null) {
-//            specification = specification.and(ProductSpecs.titleContains(title));
-//            filters.append("$title=" + title);
-//        }
-//        if (minPrice != 0) {
-//            specification = specification.and(ProductSpecs.priceGreaterThanOrEq(minPrice));
-//            filters.append("$minPrice=" + minPrice);
-//        }
-//        if (maxPrice != 0) {
-//            specification = specification.and(ProductSpecs.priceLesserThanOrEq(maxPrice));
-//            filters.append("$maxPrice=" + maxPrice);
-//        }
-//
-//        Page<Product> products = productsService.getProductsWithPagingAndFiltering(0, 5, specification);
-//        Product product = new Product();
-//        model.addAttribute("products", products.getContent());
-//        model.addAttribute("product", product);
-//        model.addAttribute("title", title);
-//        model.addAttribute("minPrice", minPrice);
-//        model.addAttribute("maxPrice", maxPrice);
-//
-//
-//        return "/products";
-//    }
-
     @GetMapping("/remove/{id}")
     public String deleteProduct(@PathVariable(value = "id") Long id) {
         productsService.removeById(id);
@@ -122,7 +81,9 @@ public class ProductsController {
     @GetMapping("/sortByASC")
     public String sortByASC(Model model) {
         Product product1 = new Product();
-        model.addAttribute("products", productsService.getAllProducts().stream().sorted(Comparator.comparingInt(Product::getPrice).reversed()).collect(Collectors.toList()));
+        model.addAttribute("products", productsService.getAllProducts().stream()
+                                                      .sorted(Comparator.comparingInt(Product::getPrice).reversed())
+                                                      .collect(Collectors.toList()));
         model.addAttribute("product", product1);
         return "/products";
     }
@@ -130,16 +91,16 @@ public class ProductsController {
     @GetMapping("/sortByDESC")
     public String sortByDESC(Model model) {
         Product product1 = new Product();
-        model.addAttribute("products", productsService.getAllProducts().stream().sorted(Comparator.comparingInt(Product::getPrice)).collect(Collectors.toList()));
+        model.addAttribute("products", productsService.getAllProducts().stream()
+                                                      .sorted(Comparator.comparingInt(Product::getPrice))
+                                                      .collect(Collectors.toList()));
         model.addAttribute("product", product1);
         return "/products";
     }
 
     @GetMapping("/show/{id}")
     public String showOneProduct(Model model, @PathVariable(value = "id") Long id) {
-        Product product = productsService.getById(id);
-        model.addAttribute("product", product);
+        model.addAttribute("product", productsService.getById(id));
         return "product-page";
     }
-
 }

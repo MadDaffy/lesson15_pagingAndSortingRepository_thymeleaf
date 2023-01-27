@@ -1,0 +1,72 @@
+springdoc:
+  packagesToScan: com.geekbrains.demoboot.controllers
+
+server:
+  port: ${SERVER_PORT:8189}
+  error:
+    whitelabel:
+      enabled: false
+
+  servlet:
+    context-path: /demo/
+
+spring:
+  application:
+    name: ms-demo-project
+
+  jackson:
+    deserialization:
+      READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE: true
+
+  profiles:
+    active: ${SPRING_PROFILE:dev}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: ${BATCH_SIZE:30}
+        default_schema: boot
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        format_sql: true
+
+  # поставить в true если нужно видеть в логах какой sql скрипт сгенерировал hiber
+    show-sql: ${SHOW_SQL:true}
+
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5433/postgres?currentSchema=boot}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:1234}
+    hikari:
+      maximum-pool-size: ${HIKARI_MAXIMUM_POOL_SIZE:25}
+      minimum-idle: 1
+      idle-timeout: 300000
+      max-lifetime: 43200000
+
+  flyway:
+    enabled: true
+    schemas: boot
+    baseline-description: baseline
+    baseline-version: 0.1.0
+    baseline-on-migrate: true
+    user: postgres
+    password: 1234
+    default-schema: boot
+
+########################################################################################################################
+###
+# Logging
+###
+logging:
+  level:
+    root: ${LOGGING_ROOT_LEVEL:INFO}
+    com.geekbrains.*: DEBUG
+
+info:
+  tags:
+    environment: ${STAND:DEV}

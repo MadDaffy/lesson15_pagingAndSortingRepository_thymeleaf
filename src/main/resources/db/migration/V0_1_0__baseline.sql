@@ -1,6 +1,6 @@
-CREATE TABLE products (id serial, title varchar(100), price int);
+CREATE TABLE product (id bigint, title varchar(100), price int);
 
-INSERT INTO products (title, price)
+INSERT INTO product (title, price)
 VALUES
     ('Product1', 10),
     ('Product2', 20),

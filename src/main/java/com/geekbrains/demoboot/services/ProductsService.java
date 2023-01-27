@@ -1,43 +1,47 @@
 package com.geekbrains.demoboot.services;
 
+import com.geekbrains.demoboot.dto.ProductDto;
+import com.geekbrains.demoboot.dto.filter.ProductFilter;
 import com.geekbrains.demoboot.entities.Product;
+import com.geekbrains.demoboot.exception.ProductNotFoundException;
+import com.geekbrains.demoboot.mapper.ProductMapper;
 import com.geekbrains.demoboot.repositories.ProductRepository;
-import com.geekbrains.demoboot.repositories.ProductRepositoryOld;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.geekbrains.demoboot.repositories.specifications.ProductSpecs;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+//TODO: используешь инъекцию через конструктор
 @Service
+@AllArgsConstructor
 public class ProductsService {
-    private ProductRepositoryOld productRepositoryOld;
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    @Autowired
-    public void setProductRepository(ProductRepositoryOld productRepositoryOld) {
-        this.productRepositoryOld = productRepositoryOld;
+    //TODO: использование DTO
+    public ProductDto getById(Long id) {
+        return productMapper.toDto(findById(id));
     }
 
-    @Autowired
-    public void setProductRepository(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
-    public Product getById(Long id) {
-        return productRepository.findById(id).get();
-    }
-
+    //TODO: каст не нужен. репа итак вернет в нужном типе, на основе конфигурации репозитория
+    // Нужно работать с Dto объектами, а не моделями. DTO используешь для того чтобы делать манипуляции, потом маппером перегоняешь в модель и уже сохраняешь.
+    // При получении принцип такой же - получил модель и сразу перегнал ее в DTO если не требуется преобразований никаких, и вернул ответ клиенту
     public List<Product> getAllProducts() {
-        return (List<Product>) productRepository.findAll();
+        return productRepository.findAll();
     }
 
     public void add(Product product) {
         productRepository.save(product);
     }
 
+    //TODO: лучше назвать метод update + в реализации у тебя тоже самое что и в добавлении, т.е это не апдейт а просто добавление нового.
+    // Нужно делать метод update и маппером проставлять новые значения
     public void edit(Product product) {
         productRepository.save(product);
     }
@@ -50,8 +54,19 @@ public class ProductsService {
         return productRepository.findAllByTitleContaining(title);
     }
 
-    public Page<Product> getProductsWithPagingAndFiltering(Specification<Product> productSpecification, Integer pageNumber, Integer pageSize) {
-        return productRepository.findAll(productSpecification, PageRequest.of(pageNumber, pageSize));
+    public List<ProductDto> findByFilter(ProductFilter filter, Pageable pageable) {
+        return findByFilter(new ProductSpecs(filter), pageable).map(productMapper::toDto).stream().collect(Collectors.toList());
+    }
+
+    private Page<Product> findByFilter(Specification<Product> specification, Pageable pageable) {
+        return productRepository.findAll(specification, pageable);
+    }
+
+    private Product findById(Long id) {
+        return productRepository.findById(id)
+                                .orElseThrow(
+                                        () -> new ProductNotFoundException(String.format("Product not found with id %s", id))
+                                );
     }
 
 }
