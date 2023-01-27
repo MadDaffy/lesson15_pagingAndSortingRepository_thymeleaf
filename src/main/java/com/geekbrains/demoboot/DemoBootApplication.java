@@ -27,6 +27,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoBootApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoBootApplication.class, args);
-        System.out.println("git");
+        System.out.println("git3");
     }
 }
