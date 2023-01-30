@@ -3,6 +3,7 @@ package com.geekbrains.demoboot.controllers;
 import com.geekbrains.demoboot.entities.Product;
 import com.geekbrains.demoboot.repositories.specifications.ProductSpecs;
 import com.geekbrains.demoboot.services.ProductsService;
+import com.geekbrains.demoboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,12 +27,14 @@ public class ProductsController {
     }
 
     @GetMapping
-    public String showProductsList(Model model,
+    public String showProductsList(Principal principal, Model model,
                                    @RequestParam(value = "title", required = false) String title,
                                    @RequestParam(value = "minPrice", required = false) Integer minPrice,
                                    @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
                                    @RequestParam(value = "pageNumber", required = false) Integer pageNumber) {
-
+        if(principal != null) {
+           model.addAttribute("username", principal.getName());
+        }
         if (pageNumber == null) {
             pageNumber = 0;
         } else {
@@ -116,6 +120,10 @@ public class ProductsController {
     @GetMapping("/remove/{id}")
     public String deleteProduct(@PathVariable(value = "id") Long id) {
         productsService.removeById(id);
+        return "redirect:/products";
+    }
+    @GetMapping("/auth")
+    public String authUser() {
         return "redirect:/products";
     }
 

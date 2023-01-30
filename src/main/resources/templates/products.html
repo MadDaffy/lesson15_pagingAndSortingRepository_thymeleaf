@@ -10,8 +10,16 @@
 
 <body>
 <div class="container">
-
-
+    <div style="margin: 30px">
+    <div th:if = "${username != null}">
+        Вы авторизовались как:
+    <td th:text="${username}"/>
+    </div>
+    <div th:unless="${username != null}">
+        <a th:href="@{'/products/auth/'}" th:text="Авторизуйтесь "/>
+        ,чтобы получить больше функционала
+    </div>
+    </div>
     <table class="table table-hover">
         <thead>
         <tr>
@@ -31,9 +39,10 @@
             <td th:text="${product.title}"/>
             <td th:text="${product.price}"/>
             <td>
-
                 <a th:href="@{'/products/show/' + ${product.id}}" th:text="view"/>
-                <a th:href="@{'/products/remove/' + ${product.id}}" th:text="delete"/>
+                <a th:if = "${username == 'admin'}">
+                    <a th:href="@{'/products/remove/' + ${product.id}}" th:text="delete"/>
+                </a>
             </td>
         </tr>
         </tbody>
@@ -68,6 +77,12 @@
             </div>
         </form>
     </div>
+    <div th:if = "${username == null}">
+        Функции добавления и редактирования товара доступна только после
+        <a th:href="@{'/products/auth/'}" th:text="авторизации"/>
+    </div>
+    <br>
+    <div th:if = "${username == 'admin'}">
     <th>Добавить товар</th>
     <form th:action="@{/products/add}"
           th:object="${product}" method="post" class="form-horizontal">
@@ -113,6 +128,7 @@
             </div>
         </div>
     </form>
+    </div>
 </div>
 
 </body>
