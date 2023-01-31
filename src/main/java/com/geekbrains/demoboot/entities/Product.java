@@ -23,4 +23,7 @@ public class Product {
     @Column(name = "price")
     private int price;
 
+    @Column(name = "view")
+    private int view;
+
 }

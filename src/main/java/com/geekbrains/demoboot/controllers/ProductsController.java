@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -146,8 +147,15 @@ public class ProductsController {
     @GetMapping("/show/{id}")
     public String showOneProduct(Model model, @PathVariable(value = "id") Long id) {
         Product product = productsService.getById(id);
+        productsService.incrementProductView(product);
         model.addAttribute("product", product);
         return "product-page";
+    }
+
+    @GetMapping("/showTop")
+    public String showTopProduct(Model model) {
+        model.addAttribute("topProducts", productsService.getAllProductsSortedByView());
+        return "top-products";
     }
 
 }

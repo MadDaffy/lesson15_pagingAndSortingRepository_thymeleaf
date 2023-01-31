@@ -12,4 +12,6 @@ public interface ProductRepository /*extends JpaRepository<Product, Long>*/ exte
 
     List<Product> findAllByTitleContaining(String title);
 
+   List<Product> findFirst3ByOrderByViewDesc();
+
 }

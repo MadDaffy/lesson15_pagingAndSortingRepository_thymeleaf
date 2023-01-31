@@ -1,4 +1,4 @@
-CREATE TABLE products (id serial, title varchar(100), price int);
+CREATE TABLE products (id serial, title varchar(100), price int, view int DEFAULT (0));
 
 INSERT INTO products (title, price)
 VALUES

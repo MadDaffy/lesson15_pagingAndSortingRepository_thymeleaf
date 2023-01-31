@@ -29,5 +29,4 @@ public class ProductSpecs {
             return criteriaBuilder.lessThanOrEqualTo(root.get("price"), value);
         };
     }
-
 }

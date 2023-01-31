@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 public class ProductRepositoryOld {
     private List<Product> products;
 
-    @PostConstruct
-    public void init() {
-        products = new ArrayList<>();
-        products.add(new Product(1L, "Meat", 350));
-        products.add(new Product(2L, "Bread", 40));
-        products.add(new Product(3L, "Milk", 90));
-        products.add(new Product(4L, "Cheese", 200));
-    }
+//    @PostConstruct
+//    public void init() {
+//        products = new ArrayList<>();
+//        products.add(new Product(1L, "Meat", 350));
+//        products.add(new Product(2L, "Bread", 40));
+//        products.add(new Product(3L, "Milk", 90));
+//        products.add(new Product(4L, "Cheese", 200));
+//    }
 
     public List<Product> findAll() {
         return products;

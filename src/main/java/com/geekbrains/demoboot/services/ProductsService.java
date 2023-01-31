@@ -50,6 +50,15 @@ public class ProductsService {
         return productRepository.findAllByTitleContaining(title);
     }
 
+    public List<Product> getAllProductsSortedByView() {
+        return productRepository.findFirst3ByOrderByViewDesc();
+    }
+
+    public void incrementProductView(Product product) {
+        product.setView(product.getView() + 1);
+        productRepository.save(product);
+    }
+
     public Page<Product> getProductsWithPagingAndFiltering(Specification<Product> productSpecification, Integer pageNumber, Integer pageSize) {
         return productRepository.findAll(productSpecification, PageRequest.of(pageNumber, pageSize));
     }
